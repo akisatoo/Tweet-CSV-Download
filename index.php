@@ -4,6 +4,8 @@ require_once 'config.php';
 
 //テーブル表示
 if ($_GET['keyword']) {
+  session_start(); // セッションを開始
+
   $connection = new TwistOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
 
   $result = [];
@@ -18,7 +20,7 @@ if ($_GET['keyword']) {
     // foreach でまわす
     foreach ($tweets as $tweet) {
       $count++;
-      
+
       $datetime = date('Y/m/d', strtotime($tweet->created_at));
       $url = sprintf('https://twitter.com/%s/status/%s/', $tweet->user->screen_name, $tweet->id_str);
 
@@ -42,6 +44,8 @@ if ($_GET['keyword']) {
     // パラメータに変換
     parse_str($next_results, $tweets_params);
   }
+
+  $_SESSION['tweet_result'] = $result;
 }
 
 ?>

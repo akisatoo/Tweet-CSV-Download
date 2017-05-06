@@ -2,40 +2,15 @@
 require 'TwistOAuth.phar';
 require_once 'config.php';
 
+session_start();
+
 //csvダウンロードの処理
-if ($_POST['download']) {
-  $connection = new TwistOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
+if ($_SESSION['tweet_result']) {
 
   $csvArr = [];
-  $tweets_params = ['q' => $_POST['download'] ,'count' => TWEET_MAX_COUNT];
-
-  for ($i = 0; $i < REQUEST_COUNT; $i++) {
-    $tweets_obj = $connection->get('search/tweets', $tweets_params);
-    $tweets = $tweets_obj->statuses;
-
-    // foreach でまわす
-    foreach ($tweets as $tweet) {
-      $datetime = date('Y/m/d', strtotime($tweet->created_at));
-      $url = sprintf('https://twitter.com/%s/status/%s/', $tweet->user->screen_name, $tweet->id_str);
-
-      $tweet_data = [];
-      $tweet_data['date'] = $datetime;
-      $tweet_data['tweet'] = $tweet->text;
-      $tweet_data['url'] = $url;
-
-      array_push($csvArr,array($tweet_data['date'],$tweet_data['tweet'],$tweet_data['url']));
-    }
-
-    // 先頭の「?」を除去
-    $next_results = preg_replace('/^\?/', '', $tweets_obj->search_metadata->next_results);
-
-    // next_results が無ければ処理を終了
-    if (!$next_results) {
-        break;
-    }
-
-    // パラメータに変換
-    parse_str($next_results, $tweets_params);
+  // foreach でまわす
+  foreach ($_SESSION['tweet_result'] as $tweet) {
+    array_push($csvArr,array($tweet['date'],$tweet['tweet'],$tweet['url']));
   }
 
   try {
