@@ -7,3 +7,4 @@ define('ACCESS_TOKEN_SECRET', 'test');
 
 //定数
 define('TWEET_MAX_COUNT', '100');
+define('REQUEST_COUNT', 10);
