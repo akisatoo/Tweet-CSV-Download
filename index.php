@@ -21,11 +21,12 @@ if ($_GET['keyword']) {
     foreach ($tweets as $tweet) {
       $count++;
 
+      $sort_date = date('Y-m-d', strtotime($tweet->created_at));
       $datetime = date('Y/m/d', strtotime($tweet->created_at));
       $url = sprintf('https://twitter.com/%s/status/%s/', $tweet->user->screen_name, $tweet->id_str);
 
       $tweet_data = [];
-      $tweet_data['num'] = $count;
+      $tweet_data['sort_date'] = $sort_date;
       $tweet_data['date'] = $datetime;
       $tweet_data['tweet'] = $tweet->text;
       $tweet_data['url'] = $url;
@@ -44,6 +45,14 @@ if ($_GET['keyword']) {
     // パラメータに変換
     parse_str($next_results, $tweets_params);
   }
+
+  $sort_date = [];
+  foreach($result as $key => $val){
+    //sort_dateでソートする準備
+    $sort_date[$key] = $val['sort_date'];
+  }
+  //配列のkeyのupdatedでソート
+  array_multisort($sort_date, SORT_ASC, $result);
 
   $_SESSION['tweet_result'] = $result;
 }
@@ -79,9 +88,11 @@ if ($_GET['keyword']) {
       echo '<th>url</th>';
       echo '</tr>';
 
+      $count = 0;
       foreach($result as $r){
+        $count++;
         echo '<tr>';
-        echo '<td>',$r['num'],'</td>';
+        echo '<td>',$count,'</td>';
         echo '<td>',$r['date'],'</td>';
         echo '<td>',$r['tweet'],'</td>';
         echo '<td><a target="_blank" href="',$r['url'],'">',$r['url'],'</a></td>';
